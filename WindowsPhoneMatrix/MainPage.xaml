@@ -7,7 +7,21 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d">
 
-    <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+    <Grid Background="#1E1E1E">
 
+        <!-- A StackPanel just stacks items vertically one after the other -->
+        <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Width="300">
+
+            <TextBlock Text="Matrix Client" FontSize="32" FontWeight="Bold" Foreground="White" Margin="0,0,0,30" HorizontalAlignment="Center"/>
+
+            <TextBox x:Name="UsernameBox" PlaceholderText="Username (e.g. elisa)" Margin="0,0,0,15" Background="White" Foreground="Black"/>
+
+            <PasswordBox x:Name="PasswordBox" PlaceholderText="Password" Margin="0,0,0,25" Background="White" Foreground="Black"/>
+
+            <Button x:Name="LoginButton" Content="Log In" Click="LoginButton_Click" HorizontalAlignment="Stretch" Background="#0078D7" Foreground="White" Height="45"/>
+
+            <TextBlock x:Name="StatusText" Text="" Margin="0,20,0,0" Foreground="Yellow" HorizontalAlignment="Center" TextWrapping="Wrap"/>
+
+        </StackPanel>
     </Grid>
 </Page>

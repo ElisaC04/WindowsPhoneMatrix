@@ -26,5 +26,14 @@ namespace WindowsPhoneMatrix
         {
             this.InitializeComponent();
         }
+
+        private void LoginButton_Click(object sender, RoutedEventArgs e)
+        {
+            // This grabs the text you typed in the boxes just to prove we can read it
+            string user = UsernameBox.Text;
+
+            // Updates the yellow status text at the bottom of the screen
+            StatusText.Text = $"Hello {user}! The button is working.";
+        }
     }
 }
