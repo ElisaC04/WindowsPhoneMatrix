@@ -60,8 +60,9 @@ namespace WindowsPhoneMatrix
                         string accessToken = rootObject.GetNamedString("access_token");
                         string deviceId = rootObject.GetNamedString("device_id");
 
-                        StatusText.Text = $"Success! Token: {accessToken.Substring(0, 10)}... \nDevice: {deviceId}";
-                        StatusText.Foreground = new Windows.UI.Xaml.Media.SolidColorBrush(Windows.UI.Colors.LimeGreen);
+                        string[] sessionData = new string[] { accessToken, server };
+                        Frame.Navigate(typeof(RoomsPage), sessionData);
+
                     }
                     else
                     {
