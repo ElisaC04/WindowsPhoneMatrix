@@ -12,14 +12,14 @@ using Windows.UI.Xaml.Data;
 using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
+//For networking
+using System.Net.Http;
+using System.Text;
+using Windows.Data.Json;
 
-// The Blank Page item template is documented at http://go.microsoft.com/fwlink/?LinkId=402352&clcid=0x409
 
 namespace WindowsPhoneMatrix
 {
-    /// <summary>
-    /// An empty page that can be used on its own or navigated to within a Frame.
-    /// </summary>
     public sealed partial class MainPage : Page
     {
         public MainPage()
@@ -27,13 +27,60 @@ namespace WindowsPhoneMatrix
             this.InitializeComponent();
         }
 
-        private void LoginButton_Click(object sender, RoutedEventArgs e)
+        private async void LoginButton_Click(object sender, RoutedEventArgs e)
         {
-            // This grabs the text you typed in the boxes just to prove we can read it
             string user = UsernameBox.Text;
+            string pass = PasswordBox.Password;
+            string server = AddressBox.Text;
 
-            // Updates the yellow status text at the bottom of the screen
-            StatusText.Text = $"Hello {user}! The button is working.";
+            StatusText.Text = "Connecting to server...";
+            LoginButton.IsEnabled = false;
+
+            try
+            {
+                using (HttpClient client = new HttpClient())
+                {
+                    // JSON payload
+                    string jsonPayload = $"{{\"type\":\"m.login.password\", \"user\":\"{user}\", \"password\":\"{pass}\"}}";
+                    var content = new StringContent(jsonPayload, Encoding.UTF8, "application/json");
+
+                    // Send POST 
+                    // (Using v3 of the Matrix Client-Server API)
+                    string loginUrl = "https://" + server + "/_matrix/client/v3/login";
+                    HttpResponseMessage response = await client.PostAsync(loginUrl, content);
+
+                    // Process response
+                    if (response.IsSuccessStatusCode)
+                    {
+                        // Success
+                        string jsonResponse = await response.Content.ReadAsStringAsync();
+
+                        // Parse for token
+                        JsonObject rootObject = JsonObject.Parse(jsonResponse);
+                        string accessToken = rootObject.GetNamedString("access_token");
+                        string deviceId = rootObject.GetNamedString("device_id");
+
+                        StatusText.Text = $"Success! Token: {accessToken.Substring(0, 10)}... \nDevice: {deviceId}";
+                        StatusText.Foreground = new Windows.UI.Xaml.Media.SolidColorBrush(Windows.UI.Colors.LimeGreen);
+                    }
+                    else
+                    {
+                        // Fail
+                        StatusText.Text = $"Login failed! Code: {response.StatusCode}";
+                        StatusText.Foreground = new Windows.UI.Xaml.Media.SolidColorBrush(Windows.UI.Colors.Red);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                // Network error
+                StatusText.Text = $"Network Error: {ex.Message}";
+                StatusText.Foreground = new Windows.UI.Xaml.Media.SolidColorBrush(Windows.UI.Colors.Red);
+            }
+            finally
+            {
+                LoginButton.IsEnabled = true;
+            }
         }
     }
 }

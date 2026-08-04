@@ -18,6 +18,8 @@
 
             <PasswordBox x:Name="PasswordBox" PlaceholderText="Password" Margin="0,0,0,25" Background="White" Foreground="Black"/>
 
+            <TextBox x:Name="AddressBox" PlaceholderText="example-server.net:8443" Margin="0,0,0,15" Background="White" Foreground="Black"/>
+
             <Button x:Name="LoginButton" Content="Log In" Click="LoginButton_Click" HorizontalAlignment="Stretch" Background="#0078D7" Foreground="White" Height="45"/>
 
             <TextBlock x:Name="StatusText" Text="" Margin="0,20,0,0" Foreground="Yellow" HorizontalAlignment="Center" TextWrapping="Wrap"/>
