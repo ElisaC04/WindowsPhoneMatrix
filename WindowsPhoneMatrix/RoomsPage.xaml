@@ -5,13 +5,36 @@
     xmlns:local="using:WindowsPhoneMatrix"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    mc:Ignorable="d">
-
-    <!-- STREAMING_CHUNK:Styling the layout for the rooms page... -->
+    mc:Ignorable="d"
+    RequestedTheme="Dark">
     <Grid Background="#1E1E1E">
-        <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
-            <TextBlock Text="Chats" Foreground="White" FontSize="36" FontWeight="Bold" Margin="0,0,0,20" HorizontalAlignment="Center"/>
-            <TextBlock x:Name="WelcomeText" Text="Loading..." Foreground="LightGray" FontSize="18" HorizontalAlignment="Center" TextWrapping="Wrap"/>
-        </StackPanel>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <!-- Header with Back (Logout) Button -->
+        <Grid Margin="20,20,20,10">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <!-- Segoe MDL2 Assets provides native Windows icons -->
+            <Button Content="&#xE72B;" FontFamily="Segoe MDL2 Assets" Background="Transparent" Foreground="White" FontSize="20" Click="BackButton_Click" Margin="0,0,15,0"/>
+
+            <TextBlock Grid.Column="1" x:Name="WelcomeText" Text="Loading chats..." FontSize="24" FontWeight="Bold" Foreground="White" VerticalAlignment="Center" TextWrapping="Wrap"/>
+        </Grid>
+
+        <ListView Grid.Row="1" x:Name="RoomsListView" IsItemClickEnabled="True" ItemClick="RoomsListView_ItemClick" Margin="20,0,20,0">
+            <ListView.ItemTemplate>
+                <DataTemplate>
+                    <StackPanel Margin="0,10,0,10">
+                        <TextBlock Text="{Binding RoomName}" FontSize="18" FontWeight="SemiBold" Foreground="White"/>
+                        <TextBlock Text="{Binding RoomId}" FontSize="12" Foreground="Gray" Margin="0,5,0,0"/>
+                    </StackPanel>
+                </DataTemplate>
+            </ListView.ItemTemplate>
+        </ListView>
     </Grid>
 </Page>

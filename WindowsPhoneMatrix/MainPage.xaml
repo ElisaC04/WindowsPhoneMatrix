@@ -5,7 +5,8 @@
     xmlns:local="using:WindowsPhoneMatrix"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    mc:Ignorable="d">
+    mc:Ignorable="d"
+    RequestedTheme="Dark">
 
     <Grid Background="#1E1E1E">
 
@@ -14,11 +15,13 @@
 
             <TextBlock Text="Matrix Client" FontSize="32" FontWeight="Bold" Foreground="White" Margin="0,0,0,30" HorizontalAlignment="Center"/>
 
-            <TextBox x:Name="UsernameBox" PlaceholderText="Username (e.g. elisa)" Margin="0,0,0,15" Background="White" Foreground="Black"/>
+            <TextBox x:Name="UsernameBox" PlaceholderText="Username (e.g. elisa)" Margin="0,0,0,15" IsSpellCheckEnabled="False"/>
 
-            <PasswordBox x:Name="PasswordBox" PlaceholderText="Password" Margin="0,0,0,25" Background="White" Foreground="Black"/>
+            <TextBox x:Name="MetaIdBox" PlaceholderText="MetaID (Optional)" Margin="0,0,0,15" IsSpellCheckEnabled="False"/>
 
-            <TextBox x:Name="AddressBox" PlaceholderText="example-server.net:8443" Margin="0,0,0,15" Background="White" Foreground="Black"/>
+            <PasswordBox x:Name="PasswordBox" PlaceholderText="Password" Margin="0,0,0,25" KeyDown="Input_KeyDown"/>
+
+            <TextBox x:Name="AddressBox" PlaceholderText="example-server.net:8443" Margin="0,0,0,15" IsSpellCheckEnabled="False"/>
 
             <Button x:Name="LoginButton" Content="Log In" Click="LoginButton_Click" HorizontalAlignment="Stretch" Background="#0078D7" Foreground="White" Height="45"/>
 
