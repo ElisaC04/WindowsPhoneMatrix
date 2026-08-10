@@ -7,9 +7,10 @@ using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Navigation;
 
+using Windows.Security.Credentials;
+
 namespace WindowsPhoneMatrix
 {
-    // This simple class holds the data for a single chat room
     public class RoomItem
     {
         public string RoomId { get; set; }
@@ -21,7 +22,6 @@ namespace WindowsPhoneMatrix
         private string _accessToken;
         private string _serverAddress;
 
-        // ObservableCollection automatically updates the ListView when we add items!
         public ObservableCollection<RoomItem> RoomsList { get; set; }
 
         public RoomsPage()
@@ -29,11 +29,11 @@ namespace WindowsPhoneMatrix
             this.InitializeComponent();
             RoomsList = new ObservableCollection<RoomItem>();
 
-            // Connect our code list to the XAML ListView
             RoomsListView.ItemsSource = RoomsList;
+
+            this.NavigationCacheMode = NavigationCacheMode.Required;
         }
 
-        // Notice we added 'async' here so we can call our sync method
         protected override async void OnNavigatedTo(NavigationEventArgs e)
         {
             base.OnNavigatedTo(e);
@@ -45,9 +45,19 @@ namespace WindowsPhoneMatrix
                 _accessToken = sessionData[0];
                 _serverAddress = sessionData[1];
 
-                // Kick off the network request
-                await SyncRoomsAsync();
+
+                if(e.NavigationMode != NavigationMode.Back)
+                {
+                    await SyncRoomsAsync();
+                }
             }
+        }
+
+        private async void RefreshButton_Click(object sender, RoutedEventArgs e)
+        {
+            RoomsList.Clear();
+            WelcomeText.Text = "Refreshing chats...";
+            await SyncRoomsAsync();
         }
 
         private async Task SyncRoomsAsync()
@@ -56,17 +66,14 @@ namespace WindowsPhoneMatrix
             {
                 using (HttpClient client = new HttpClient())
                 {
-                    // 1. Ask the Matrix server for ALL our data
                     string syncUrl = $"https://{_serverAddress}/_matrix/client/v3/sync?access_token={_accessToken}";
                     HttpResponseMessage response = await client.GetAsync(syncUrl);
 
                     if (response.IsSuccessStatusCode)
                     {
-                        // 2. Read the massive JSON response
                         string jsonResponse = await response.Content.ReadAsStringAsync();
                         JsonObject rootObject = JsonObject.Parse(jsonResponse);
 
-                        // 3. Dig into the JSON: root -> rooms -> join
                         if (rootObject.ContainsKey("rooms"))
                         {
                             JsonObject roomsObj = rootObject.GetNamedObject("rooms");
@@ -74,12 +81,10 @@ namespace WindowsPhoneMatrix
                             {
                                 JsonObject joinedRooms = roomsObj.GetNamedObject("join");
 
-                                // 4. Loop through every room we are joined to
                                 foreach (string roomId in joinedRooms.Keys)
                                 {
                                     string roomName = "Unnamed Room";
 
-                                    // 5. Dig deeper into the state events to find the room's name
                                     JsonObject roomData = joinedRooms.GetNamedObject(roomId);
                                     if (roomData.ContainsKey("state"))
                                     {
@@ -88,20 +93,18 @@ namespace WindowsPhoneMatrix
                                         {
                                             JsonArray eventsArray = stateObj.GetNamedArray("events");
 
-                                            // Look through all events for the "m.room.name" type
                                             foreach (IJsonValue eventValue in eventsArray)
                                             {
                                                 JsonObject evt = eventValue.GetObject();
                                                 if (evt.GetNamedString("type") == "m.room.name")
                                                 {
                                                     roomName = evt.GetNamedObject("content").GetNamedString("name");
-                                                    break; // We found the name, stop searching events
+                                                    break;
                                                 }
                                             }
                                         }
                                     }
 
-                                    // 6. Add it to our UI list!
                                     RoomsList.Add(new RoomItem { RoomId = roomId, RoomName = roomName });
                                 }
                             }
@@ -141,13 +144,25 @@ namespace WindowsPhoneMatrix
 
         private void BackButton_Click(object sender, RoutedEventArgs e)
         {
-            // Wipe the saved data
             var localSettings = Windows.Storage.ApplicationData.Current.LocalSettings;
-            localSettings.Values.Remove("AccessToken");
+            localSettings.Values.Remove("MetaId");
             localSettings.Values.Remove("ServerAddress");
             localSettings.Values.Remove("Username");
 
-            // Go back to login screen
+            try
+            {
+                var vault = new PasswordVault();
+                var credentials = vault.FindAllByResource("WindowsPhoneMatrix");
+                foreach(var cred in credentials)
+                {
+                    vault.Remove(cred);
+                }
+            }
+            catch (Exception)
+            {
+
+            }
+
             if (this.Frame.CanGoBack)
             {
                 this.Frame.GoBack();

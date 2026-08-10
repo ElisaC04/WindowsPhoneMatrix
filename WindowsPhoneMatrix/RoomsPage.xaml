@@ -13,17 +13,18 @@
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
-        <!-- Header with Back (Logout) Button -->
         <Grid Margin="20,20,20,10">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
             </Grid.ColumnDefinitions>
 
-            <!-- Segoe MDL2 Assets provides native Windows icons -->
             <Button Content="&#xE72B;" FontFamily="Segoe MDL2 Assets" Background="Transparent" Foreground="White" FontSize="20" Click="BackButton_Click" Margin="0,0,15,0"/>
 
             <TextBlock Grid.Column="1" x:Name="WelcomeText" Text="Loading chats..." FontSize="24" FontWeight="Bold" Foreground="White" VerticalAlignment="Center" TextWrapping="Wrap"/>
+
+            <Button Grid.Column="2" Content="&#xE149;" FontFamily="Segoe MDL2 Assets" Background="Transparent" Foreground="White" FontSize="20" Click="RefreshButton_Click" Margin="15,0,0,0"/>
         </Grid>
 
         <ListView Grid.Row="1" x:Name="RoomsListView" IsItemClickEnabled="True" ItemClick="RoomsListView_ItemClick" Margin="20,0,20,0">

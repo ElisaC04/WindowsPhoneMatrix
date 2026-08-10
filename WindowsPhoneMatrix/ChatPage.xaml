@@ -15,7 +15,6 @@
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
-        <!-- Header with Back Button -->
         <Grid Margin="20,20,20,10">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto"/>
@@ -27,9 +26,7 @@
             <TextBlock Grid.Column="1" x:Name="RoomNameText" Text="Room Name" FontSize="24" FontWeight="Bold" Foreground="White" VerticalAlignment="Center"/>
         </Grid>
 
-        <!-- Message History -->
         <ListView Grid.Row="1" x:Name="MessagesListView" Margin="10,0,10,10" SelectionMode="None">
-            <!-- This ItemContainerStyle fixes the alignment issue! -->
             <ListView.ItemContainerStyle>
                 <Style TargetType="ListViewItem">
                     <Setter Property="HorizontalContentAlignment" Value="Stretch" />
@@ -48,14 +45,13 @@
             </ListView.ItemTemplate>
         </ListView>
 
-        <!-- Text Input Box -->
         <Grid Grid.Row="2" Margin="10,10,10,20" Background="#2D2D30" Padding="5">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="Auto"/>
             </Grid.ColumnDefinitions>
 
-            <TextBox x:Name="MessageInputBox" PlaceholderText="Type a message..." Background="Transparent" Foreground="White" BorderThickness="0" VerticalAlignment="Center"/>
+            <TextBox x:Name="MessageInputBox" PlaceholderText="Type a message..." AcceptsReturn="True" TextWrapping="Wrap" Background="Transparent" Foreground="White" BorderThickness="0" VerticalAlignment="Center"/>
             <Button x:Name="SendButton" Grid.Column="1" Content="Send" Click="SendButton_Click" Background="#0078D7" Foreground="White" Margin="10,0,0,0"/>
         </Grid>
 

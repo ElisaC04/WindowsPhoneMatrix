@@ -1,27 +1,17 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Runtime.InteropServices.WindowsRuntime;
-using Windows.Foundation;
-using Windows.Foundation.Collections;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
-using Windows.UI.Xaml.Controls.Primitives;
-using Windows.UI.Xaml.Data;
 using Windows.UI.Xaml.Input;
-using Windows.UI.Xaml.Media;
-using Windows.UI.Xaml.Navigation;
-//For networking
 using System.Net.Http;
 using System.Text;
 using Windows.Data.Json;
 
-//For existing login check
 using Windows.Storage;
 
 
 using Windows.Foundation.Metadata;
+
+using Windows.Security.Credentials;
 
 namespace WindowsPhoneMatrix
 {
@@ -37,7 +27,6 @@ namespace WindowsPhoneMatrix
 
         private void MainPage_Loaded(object sender, RoutedEventArgs e)
         {
-            // Optional: Make the title bar dark if running on a Desktop PC
             var titleBar = Windows.UI.ViewManagement.ApplicationView.GetForCurrentView().TitleBar;
             titleBar.BackgroundColor = Windows.UI.Color.FromArgb(255, 30, 30, 30);
             titleBar.ButtonBackgroundColor = Windows.UI.Color.FromArgb(255, 30, 30, 30);
@@ -54,18 +43,42 @@ namespace WindowsPhoneMatrix
 
             var localSettings = ApplicationData.Current.LocalSettings;
 
-            // Check if we've logged in before
-            if (localSettings.Values.ContainsKey("AccessToken") &&
-                localSettings.Values.ContainsKey("ServerAddress") &&
-                localSettings.Values.ContainsKey("Username"))
-            {
-                string savedToken = localSettings.Values["AccessToken"].ToString();
-                string savedServer = localSettings.Values["ServerAddress"].ToString();
+            // if (localSettings.Values.ContainsKey("AccessToken") &&
+            //     localSettings.Values.ContainsKey("ServerAddress") &&
+            //    localSettings.Values.ContainsKey("Username"))
+            //{
+            //  string savedToken = localSettings.Values["AccessToken"].ToString();
+            //string savedServer = localSettings.Values["ServerAddress"].ToString();
 
-                string[] sessionData = new string[] { savedToken, savedServer };
-                Frame.Navigate(typeof(RoomsPage), sessionData);
+            // string[] sessionData = new string[] { savedToken, savedServer };
+            // Frame.Navigate(typeof(RoomsPage), sessionData);
+            //}
+
+            if (localSettings.Values.ContainsKey("ServerAddress"))
+            {
+                try
+                {
+                    var vault = new PasswordVault();
+                    var credentialList = vault.FindAllByResource("WindowsPhoneMatrix");
+
+                    if (credentialList.Count > 0)
+                    {
+                        var cred = credentialList[0];
+                        cred.RetrievePassword();
+
+                        string savedToken = cred.Password;
+                        string savedServer = localSettings.Values["ServerAddress"].ToString();
+
+                        string[] sessionData = new string[] { savedToken, savedServer };
+                        Frame.Navigate(typeof(RoomsPage), sessionData);
+                    }
+                }
+                catch (Exception)
+                {
+
+                }
             }
-        }
+         }
 
         private void Input_KeyDown(object sender, KeyRoutedEventArgs e)
         {
@@ -89,28 +102,24 @@ namespace WindowsPhoneMatrix
             {
                 using (HttpClient client = new HttpClient())
                 {
-                    // JSON payload
                     string jsonPayload = $"{{\"type\":\"m.login.password\", \"user\":\"{user}\", \"password\":\"{pass}\"}}";
                     var content = new StringContent(jsonPayload, Encoding.UTF8, "application/json");
 
-                    // Send POST 
-                    // (Using v3 of the Matrix Client-Server API)
                     string loginUrl = "https://" + server + "/_matrix/client/v3/login";
                     HttpResponseMessage response = await client.PostAsync(loginUrl, content);
 
-                    // Process response
                     if (response.IsSuccessStatusCode)
                     {
-                        // Success
                         string jsonResponse = await response.Content.ReadAsStringAsync();
 
-                        // Parse for token
                         JsonObject rootObject = JsonObject.Parse(jsonResponse);
                         string accessToken = rootObject.GetNamedString("access_token");
-                       // string deviceId = rootObject.GetNamedString("device_id");
+                        // string deviceId = rootObject.GetNamedString("device_id");
+
+                        var vault = new PasswordVault();
+                        vault.Add(new PasswordCredential("WindowsPhoneMatrix", user, accessToken));
 
                         var localSettings = ApplicationData.Current.LocalSettings;
-                        localSettings.Values["AccessToken"] = accessToken;
                         localSettings.Values["ServerAddress"] = server;
                         localSettings.Values["Username"] = user;
 
@@ -125,7 +134,6 @@ namespace WindowsPhoneMatrix
                     }
                     else
                     {
-                        // Fail
                         StatusText.Text = $"Login failed! Code: {response.StatusCode}";
                         StatusText.Foreground = new Windows.UI.Xaml.Media.SolidColorBrush(Windows.UI.Colors.Red);
                     }
@@ -133,7 +141,6 @@ namespace WindowsPhoneMatrix
             }
             catch (Exception ex)
             {
-                // Network error
                 StatusText.Text = $"Network Error: {ex.Message}";
                 StatusText.Foreground = new Windows.UI.Xaml.Media.SolidColorBrush(Windows.UI.Colors.Red);
             }

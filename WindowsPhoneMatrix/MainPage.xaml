@@ -10,7 +10,6 @@
 
     <Grid Background="#1E1E1E">
 
-        <!-- A StackPanel just stacks items vertically one after the other -->
         <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Width="300">
 
             <TextBlock Text="Matrix Client" FontSize="32" FontWeight="Bold" Foreground="White" Margin="0,0,0,30" HorizontalAlignment="Center"/>
