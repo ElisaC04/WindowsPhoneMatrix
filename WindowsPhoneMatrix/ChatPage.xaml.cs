@@ -65,7 +65,10 @@ namespace WindowsPhoneMatrix
             {
                 using (HttpClient client = new HttpClient())
                 {
-                    string syncUrl = $"https://{_serverAddress}/_matrix/client/v3/sync?access_token={_accessToken}";
+                    string filterJson = "{\"room\":{\"timeline\":{\"limit\":50}}}";
+                    string encodedFilter = Uri.EscapeDataString(filterJson);
+
+                    string syncUrl = $"https://{_serverAddress}/_matrix/client/v3/sync?filter={encodedFilter}&access_token={_accessToken}";
                     HttpResponseMessage response = await client.GetAsync(syncUrl);
 
                     if (response.IsSuccessStatusCode)
@@ -325,7 +328,11 @@ namespace WindowsPhoneMatrix
                     string txnId = Guid.NewGuid().ToString();
                     string url = $"https://{_serverAddress}/_matrix/client/v3/rooms/{_roomId}/send/m.room.message/{txnId}?access_token={_accessToken}";
 
-                    string jsonPayload = $"{{\"msgtype\":\"m.text\", \"body\":\"{message}\"}}";
+                    JsonObject messageJson = new JsonObject();
+                    messageJson.SetNamedValue("msgtype", JsonValue.CreateStringValue("m.text"));
+                    messageJson.SetNamedValue("body", JsonValue.CreateStringValue(message));
+
+                    string jsonPayload = messageJson.Stringify();
                     var content = new StringContent(jsonPayload, Encoding.UTF8, "application/json");
 
                     HttpResponseMessage response = await client.PutAsync(url, content);

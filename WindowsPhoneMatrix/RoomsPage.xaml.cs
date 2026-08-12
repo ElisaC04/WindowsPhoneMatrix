@@ -45,8 +45,7 @@ namespace WindowsPhoneMatrix
                 _accessToken = sessionData[0];
                 _serverAddress = sessionData[1];
 
-
-                if(e.NavigationMode != NavigationMode.Back)
+                if (e.NavigationMode != NavigationMode.Back)
                 {
                     await SyncRoomsAsync();
                 }
@@ -83,9 +82,10 @@ namespace WindowsPhoneMatrix
 
                                 foreach (string roomId in joinedRooms.Keys)
                                 {
-                                    string roomName = "Unnamed Room";
+                                    string roomName = "Unknown Chat";
 
                                     JsonObject roomData = joinedRooms.GetNamedObject(roomId);
+
                                     if (roomData.ContainsKey("state"))
                                     {
                                         JsonObject stateObj = roomData.GetNamedObject("state");
@@ -100,6 +100,28 @@ namespace WindowsPhoneMatrix
                                                 {
                                                     roomName = evt.GetNamedObject("content").GetNamedString("name");
                                                     break;
+                                                }
+                                            }
+                                        }
+                                    }
+
+                                    if (roomName == "Unknown Chat" && roomData.ContainsKey("timeline"))
+                                    {
+                                        JsonObject timelineObj = roomData.GetNamedObject("timeline");
+                                        if (timelineObj.ContainsKey("events"))
+                                        {
+                                            JsonArray timelineEvents = timelineObj.GetNamedArray("events");
+                                            foreach (IJsonValue timelineVal in timelineEvents)
+                                            {
+                                                JsonObject timelineEvt = timelineVal.GetObject();
+                                                if (timelineEvt.GetNamedString("type") == "m.room.name")
+                                                {
+                                                    JsonObject content = timelineEvt.GetNamedObject("content");
+                                                    if (content.ContainsKey("name"))
+                                                    {
+                                                        roomName = content.GetNamedString("name");
+                                                        break;
+                                                    }
                                                 }
                                             }
                                         }
@@ -153,7 +175,7 @@ namespace WindowsPhoneMatrix
             {
                 var vault = new PasswordVault();
                 var credentials = vault.FindAllByResource("WindowsPhoneMatrix");
-                foreach(var cred in credentials)
+                foreach (var cred in credentials)
                 {
                     vault.Remove(cred);
                 }

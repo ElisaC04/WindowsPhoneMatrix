@@ -102,10 +102,25 @@ namespace WindowsPhoneMatrix
             {
                 using (HttpClient client = new HttpClient())
                 {
-                    string jsonPayload = $"{{\"type\":\"m.login.password\", \"user\":\"{user}\", \"password\":\"{pass}\"}}";
+                    string cleanServer = server.Trim();
+                    if (cleanServer.Contains("/") || cleanServer.Contains(" ") || cleanServer.Contains("?"))
+                    {
+                        StatusText.Text = "Invalid server address. Please enter a domain or IP only.";
+                        LoginButton.IsEnabled = true;
+                        return;
+                    }
+
+                    JsonObject loginJson = new JsonObject();
+                    loginJson.SetNamedValue("type", JsonValue.CreateStringValue("m.login.password"));
+                    loginJson.SetNamedValue("user", JsonValue.CreateStringValue(user));
+                    loginJson.SetNamedValue("password", JsonValue.CreateStringValue(pass));
+
+                    string jsonPayload = loginJson.Stringify();
                     var content = new StringContent(jsonPayload, Encoding.UTF8, "application/json");
 
-                    string loginUrl = "https://" + server + "/_matrix/client/v3/login";
+                    string loginUrl = $"https://{cleanServer}/_matrix/client/v3/login";
+
+
                     HttpResponseMessage response = await client.PostAsync(loginUrl, content);
 
                     if (response.IsSuccessStatusCode)
