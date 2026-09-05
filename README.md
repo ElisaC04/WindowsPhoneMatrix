@@ -7,7 +7,7 @@
 The goal of this project is to develop a Windows Phone native app that can communicate with the synapse/mautrix-meta server combo.
 The first release is out ~~and the guide is up.~~
 
-In my Synaptrix8.1 project I reworked the server setup to be more readable, MD formatted and redid the steps with more security in mind. Even if you are on Windosw Phone 10 I recommend you use that client, it is fully compatible with WP10 and 8.1, has a lot more features and I will still develop it. If you still want to use WindowsPhoneMatrix the server setup guide is available [here](https://github.com/ElisaC04/Synaptrix8.1/blob/main/SETUP.md). Configure only the mautrix-meta bridge as the client is not prepared to handle other bridges :)
+In my [Synaptrix8.1](https://github.com/ElisaC04/Synaptrix8.1) project I reworked the server setup to be more readable, MD formatted and redid the steps with more security in mind. Even if you are on Windosw Phone 10 I recommend you use that client, it is fully compatible with WP10 and 8.1, has a lot more features and I will still develop it. If you still want to use WindowsPhoneMatrix the server setup guide is available [here](https://github.com/ElisaC04/Synaptrix8.1/blob/main/SETUP.md). Configure only the mautrix-meta bridge as the client is not prepared to handle other bridges :)
 
 To install make sure you install the certificate and dependencies first, which are at the release page.
 
